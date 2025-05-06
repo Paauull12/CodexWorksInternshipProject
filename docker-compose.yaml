@@ -1,0 +1,58 @@
+services:
+  codeworks-db:
+    image: postgres:14
+    container_name: codeworks-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=todo_app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    
+  backend:
+    build:
+      context: ./backend
+    container_name: backend-service
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=django-insecure-key-for-dev-only
+      - DEBUG=1
+      - DB_NAME=todo_app
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=codeworks-db
+      - DB_PORT=5432
+    depends_on:
+      - codeworks-db
+    restart: always
+    
+  chatbot:
+    build:
+      context: ./chatbotstuff
+    container_name: chatbot-service
+    ports:
+      - "5000:5000"
+    environment:
+      - TODO_API_URL=http://backend:8000/api
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - backend
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontendapp
+    container_name: frontend-service
+    ports:
+      - "8080:3000"
+    depends_on:
+      - backend
+      - chatbot
+    restart: always
+
+volumes:
+  postgres_data:
