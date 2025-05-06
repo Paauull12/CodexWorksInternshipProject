@@ -118,20 +118,28 @@ class TodoDetailView(APIView):
         todo = get_object_or_404(Todo, pk=pk, user=request.user)
 
         if todo.status == 'done':
-
             return Response(
                 {'error': 'Cannot update todos with status "done"'},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        serializer1 = TodoSerializer(todo, data=request.data, context={'request': request})
+        update_data = {}
+        for field, value in request.data.items():
+            if value is not None:
+                update_data[field] = value
 
-        if serializer1.is_valid():
-            serializer1.save()
-            return Response({'todo' : serializer1.data}, status=status.HTTP_200_OK)
+        serializer = TodoSerializer(
+            todo, 
+            data=update_data, 
+            partial=True, 
+            context={'request': request}
+        )
 
-        return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'todo': serializer.data}, status=status.HTTP_200_OK)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def delete(self, request, pk):
         todo = get_object_or_404(Todo, pk=pk, user=request.user)
         todo.delete()
