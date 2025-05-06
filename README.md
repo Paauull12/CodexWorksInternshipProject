@@ -20,6 +20,7 @@ Since it’s late to ask, here are my answers:
   - Note: front-end design/dev is not my strong suit, but it’s something I want to improve.
 - **AI usage:**
   - Mainly for Django syntax Q&A
+  - (sudo) docker-compose up  -- in the root directory
   - Some debugging help for the chatbot (I haven’t used LangChain in a while) and some suggestions without witch the app won't work that well :))
   - Barely used it for the front-end, except for some specific chatbot component logic and some boilerplate JSX code :)
 
